@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Farmer List</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Farmer List</h1>
+    <p>Add a farmer and see the current temperature where they farm.</p>
+  </header>
+
+  <main>
+    <section aria-labelledby="add-heading">
+      <h2 id="add-heading">Add a farmer</h2>
+      <div class="fields">
+        <div>
+          <label for="farmer-name">Name</label>
+          <input id="farmer-name" type="text">
+        </div>
+        <div>
+          <label for="farmer-crop">Main crop</label>
+          <input id="farmer-crop" type="text">
+        </div>
+        <div>
+          <label for="farmer-town">Town</label>
+          <select id="farmer-town">
+            <option>Harare</option>
+            <option>Bulawayo</option>
+            <option>Mutare</option>
+            <option>Masvingo</option>
+            <option>Bindura</option>
+            <option>Gweru</option>
+          </select>
+        </div>
+      </div>
+      <button id="add-btn" type="button">Add farmer</button>
+      <p id="message" role="status"></p>
+    </section>
+
+    <section aria-labelledby="list-heading">
+      <h2 id="list-heading">Farmers</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Main crop</th>
+              <th scope="col">Town</th>
+              <th scope="col">Temperature now</th>
+            </tr>
+          </thead>
+          <tbody id="farmer-list">
+            <tr><td colspan="4">Loading farmers...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Weather data from Open-Meteo.</p>
+    </section>
+
+    <section aria-labelledby="progress-heading">
+      <h2 id="progress-heading">What I've built so far</h2>
+      <ul class="progress">
+        <li><strong>Week 1:</strong> HTML basics and page structure</li>
+        <li><strong>Weeks 2 and 3:</strong> CSS, accessibility and usability</li>
+        <li><strong>Week 4:</strong> JavaScript interactivity</li>
+        <li><strong>Week 5:</strong> HTML DOM with <code>getElementById</code>, then the Open-Meteo API with <code>fetch</code></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built for the Web Technologies module.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

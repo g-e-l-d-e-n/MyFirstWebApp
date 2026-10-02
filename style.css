@@ -1,0 +1,123 @@
+:root {
+  --bg: #f1f4ef;
+  --card: #ffffff;
+  --ink: #1d2a20;
+  --muted: #55645a;
+  --line: #cdd6cf;
+  --accent: #2f6b3a;
+  --accent-ink: #ffffff;
+  --wheat: #b8860b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141a16;
+    --card: #1c2520;
+    --ink: #e8efe9;
+    --muted: #a6b3aa;
+    --line: #34423a;
+    --accent: #6fbf7e;
+    --accent-ink: #10190f;
+    --wheat: #e0b84a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 1rem/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+header, main, footer {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+header { padding-top: 2.5rem; }
+
+h1 {
+  font: 700 2.2rem/1.15 Georgia, "Times New Roman", serif;
+  margin: 0 0 .5rem;
+}
+
+h2 {
+  font: 700 1.3rem/1.3 Georgia, serif;
+  margin: 0 0 .75rem;
+}
+
+header p { color: var(--muted); margin: 0 0 1.5rem; }
+
+section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+label { display: block; font-weight: 600; margin-bottom: .25rem; }
+
+input, select {
+  width: 100%;
+  padding: .5rem .6rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: .55rem 1.2rem;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover { filter: brightness(1.08); }
+
+input:focus-visible, select:focus-visible, button:focus-visible {
+  outline: 3px solid var(--wheat);
+  outline-offset: 2px;
+}
+
+#message { min-height: 1.5rem; margin: .75rem 0 0; color: var(--muted); }
+#message.error { color: #b3261e; }
+
+@media (prefers-color-scheme: dark) {
+  #message.error { color: #f2a19b; }
+}
+
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; }
+
+th, td {
+  text-align: left;
+  padding: .6rem .5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+th { color: var(--muted); font-weight: 600; }
+
+.note { color: var(--muted); font-size: .9rem; margin: .75rem 0 0; }
+
+.progress { margin: 0; padding-left: 1.2rem; }
+.progress li { margin-bottom: .4rem; }
+
+footer { color: var(--muted); font-size: .9rem; padding-bottom: 2.5rem; }
