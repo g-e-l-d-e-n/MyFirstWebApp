@@ -36,7 +36,7 @@ function getTemperature(town) {
   return temperatureCache[town];
 }
 
-function addRow(farmer) {
+function addRow(farmer, animate) {
   const list = document.getElementById("farmer-list");
   const row = document.createElement("tr");
 
@@ -51,6 +51,11 @@ function addRow(farmer) {
   row.appendChild(tempCell);
   list.appendChild(row);
 
+  // jQuery: new rows fade in, the first render does not
+  if (animate) {
+    $(row).hide().fadeIn(400);
+  }
+
   getTemperature(farmer.town)
     .then(function (text) { tempCell.textContent = text; })
     .catch(function () { tempCell.textContent = "Weather unavailable"; });
@@ -64,7 +69,7 @@ function showMessage(text, isError) {
 
 function renderFarmers() {
   document.getElementById("farmer-list").innerHTML = "";
-  farmers.forEach(addRow);
+  farmers.forEach(function (farmer) { addRow(farmer, false); });
 }
 
 document.getElementById("add-btn").addEventListener("click", function () {
@@ -82,7 +87,7 @@ document.getElementById("add-btn").addEventListener("click", function () {
 
   const farmer = { name: name, crop: crop, town: town };
   farmers.push(farmer);
-  addRow(farmer);
+  addRow(farmer, true);
 
   nameInput.value = "";
   cropInput.value = "";
@@ -91,3 +96,15 @@ document.getElementById("add-btn").addEventListener("click", function () {
 });
 
 renderFarmers();
+
+// jQuery: show or hide the farmer table
+$(function () {
+  $("#toggle-list").on("click", function () {
+    const button = $(this);
+    const isOpen = button.attr("aria-expanded") === "true";
+
+    $("#table-wrap").slideToggle();
+    button.attr("aria-expanded", !isOpen)
+          .text(isOpen ? "Show farmers" : "Hide farmers");
+  });
+});

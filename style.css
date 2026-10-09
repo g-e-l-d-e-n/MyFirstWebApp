@@ -103,6 +103,8 @@ input:focus-visible, select:focus-visible, button:focus-visible {
   #message.error { color: #f2a19b; }
 }
 
+#toggle-list { margin-bottom: 1rem; }
+
 .table-wrap { overflow-x: auto; }
 
 table { width: 100%; border-collapse: collapse; }
