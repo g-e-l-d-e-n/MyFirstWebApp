@@ -1,30 +1,19 @@
-// Sample farmers. Replace these with your own data.
+// Sample farmers. Lat/lon come from the town list or the town search.
 const farmers = [
-  { name: "Tendai Moyo", crop: "Maize", town: "Bindura" },
-  { name: "Rudo Chikwanha", crop: "Tobacco", town: "Mutare" },
-  { name: "Farai Ncube", crop: "Cotton", town: "Gweru" }
+  { name: "Tendai Moyo", crop: "Maize", town: "Bindura", lat: -17.30, lon: 31.33, size: 12, water: "Rain-fed" },
+  { name: "Rudo Chikwanha", crop: "Tobacco", town: "Mutare", lat: -18.97, lon: 32.67, size: 8.5, water: "Irrigated" },
+  { name: "Farai Ncube", crop: "Cotton", town: "Gweru", lat: -19.45, lon: 29.82, size: 20, water: "Rain-fed" }
 ];
 
-// Latitude and longitude for each town, used by the weather API.
-const towns = {
-  Harare:   { lat: -17.83, lon: 31.05 },
-  Bulawayo: { lat: -20.15, lon: 28.58 },
-  Mutare:   { lat: -18.97, lon: 32.67 },
-  Masvingo: { lat: -20.07, lon: 30.83 },
-  Bindura:  { lat: -17.30, lon: 31.33 },
-  Gweru:    { lat: -19.45, lon: 29.82 }
-};
-
-// Remember each town's temperature so we only ask the API once per town.
+// Open-Meteo forecast endpoint. Cached so each place is only requested once.
 const temperatureCache = {};
 
-function getTemperature(town) {
-  if (!temperatureCache[town]) {
-    const place = towns[town];
-    const url = "https://api.open-meteo.com/v1/forecast?latitude=" + place.lat +
-                "&longitude=" + place.lon + "&current=temperature_2m";
-
-    temperatureCache[town] = fetch(url)
+function getTemperature(lat, lon) {
+  const key = lat + "," + lon;
+  if (!temperatureCache[key]) {
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat +
+                "&longitude=" + lon + "&current=temperature_2m";
+    temperatureCache[key] = fetch(url)
       .then(function (response) {
         if (!response.ok) throw new Error("Request failed");
         return response.json();
@@ -33,14 +22,14 @@ function getTemperature(town) {
         return data.current.temperature_2m + " " + data.current_units.temperature_2m;
       });
   }
-  return temperatureCache[town];
+  return temperatureCache[key];
 }
 
 function addRow(farmer, animate) {
   const list = document.getElementById("farmer-list");
   const row = document.createElement("tr");
 
-  [farmer.name, farmer.crop, farmer.town].forEach(function (value) {
+  [farmer.name, farmer.crop, farmer.town, farmer.size, farmer.water].forEach(function (value) {
     const cell = document.createElement("td");
     cell.textContent = value;
     row.appendChild(cell);
@@ -51,12 +40,9 @@ function addRow(farmer, animate) {
   row.appendChild(tempCell);
   list.appendChild(row);
 
-  // jQuery: new rows fade in, the first render does not
-  if (animate) {
-    $(row).hide().fadeIn(400);
-  }
+  if (animate) { $(row).hide().fadeIn(400); }
 
-  getTemperature(farmer.town)
+  getTemperature(farmer.lat, farmer.lon)
     .then(function (text) { tempCell.textContent = text; })
     .catch(function () { tempCell.textContent = "Weather unavailable"; });
 }
@@ -72,39 +58,104 @@ function renderFarmers() {
   farmers.forEach(function (farmer) { addRow(farmer, false); });
 }
 
-document.getElementById("add-btn").addEventListener("click", function () {
-  const nameInput = document.getElementById("farmer-name");
-  const cropInput = document.getElementById("farmer-crop");
-  const town = document.getElementById("farmer-town").value;
+// Open-Meteo geocoding endpoint: search results fill the town select list.
+document.getElementById("find-town").addEventListener("click", function () {
+  const search = document.getElementById("town-search");
+  const select = document.getElementById("farmer-town");
+  const button = this;
+  const term = search.value.trim();
 
-  const name = nameInput.value.trim();
-  const crop = cropInput.value.trim();
-
-  if (name === "" || crop === "") {
-    showMessage("Enter a name and a main crop first.", true);
+  if (term.length < 2) {
+    showMessage("Type at least two letters to search for a town.", true);
+    search.focus();
     return;
   }
 
-  const farmer = { name: name, crop: crop, town: town };
-  farmers.push(farmer);
-  addRow(farmer, true);
+  button.disabled = true;
+  showMessage("Searching for " + term + "...", false);
 
-  nameInput.value = "";
-  cropInput.value = "";
-  nameInput.focus();
-  showMessage(name + " added to the list.", false);
+  fetch("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(term) +
+        "&count=10&language=en&format=json&countryCode=ZW")
+    .then(function (response) {
+      if (!response.ok) throw new Error("Request failed");
+      return response.json();
+    })
+    .then(function (data) {
+      const results = data.results || [];
+      if (results.length === 0) {
+        showMessage("No towns found for " + term + ".", true);
+        return;
+      }
+      select.innerHTML = "";
+      results.forEach(function (place) {
+        const option = document.createElement("option");
+        option.textContent = place.name + (place.admin1 ? ", " + place.admin1 : "");
+        option.dataset.lat = place.latitude;
+        option.dataset.lon = place.longitude;
+        option.dataset.name = place.name;
+        select.appendChild(option);
+      });
+      showMessage(results.length + " town(s) found. Choose one from the list.", false);
+      select.focus();
+    })
+    .catch(function () { showMessage("Town search is unavailable. Pick from the current list.", true); })
+    .then(function () { button.disabled = false; });
 });
 
+// Form submit: the browser checks required, min, max, minlength and type first.
+document.getElementById("farmer-form").addEventListener("submit", function (event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    showMessage("Check the highlighted fields and try again.", true);
+    return;
+  }
+
+  const option = document.getElementById("farmer-town").selectedOptions[0];
+  const farmer = {
+    name: document.getElementById("farmer-name").value.trim(),
+    crop: document.getElementById("farmer-crop").value.trim(),
+    town: option.dataset.name || option.textContent,
+    lat: option.dataset.lat,
+    lon: option.dataset.lon,
+    size: document.getElementById("farm-size").value,
+    water: form.elements.water.value
+  };
+
+  farmers.push(farmer);
+  addRow(farmer, true);
+  form.reset();
+  document.getElementById("farmer-name").focus();
+  showMessage(farmer.name + " added to the list.", false);
+});
+
+// World Bank endpoint (second provider): share of land used for agriculture.
+function loadContext() {
+  const text = document.getElementById("context-text");
+  fetch("https://api.worldbank.org/v2/country/ZW/indicator/AG.LND.AGRI.ZS?format=json&mrnev=1")
+    .then(function (response) {
+      if (!response.ok) throw new Error("Request failed");
+      return response.json();
+    })
+    .then(function (data) {
+      const item = data[1][0];
+      text.textContent = Number(item.value).toFixed(1) + "% of Zimbabwe's land area was agricultural land in " +
+                         item.date + " (World Bank).";
+    })
+    .catch(function () { text.textContent = "National land figures are unavailable right now."; });
+}
+
 renderFarmers();
+loadContext();
 
 // jQuery: show or hide the farmer table
 $(function () {
   $("#toggle-list").on("click", function () {
     const button = $(this);
     const isOpen = button.attr("aria-expanded") === "true";
-
     $("#table-wrap").slideToggle();
-    button.attr("aria-expanded", !isOpen)
-          .text(isOpen ? "Show farmers" : "Hide farmers");
+    button.attr("aria-expanded", !isOpen).text(isOpen ? "Show farmers" : "Hide farmers");
   });
 });

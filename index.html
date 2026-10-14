@@ -3,41 +3,91 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Farmer List: record farmers and see the current temperature where they farm.">
   <title>Farmer List</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to main content</a>
   <header>
     <h1>Farmer List</h1>
     <p>Add a farmer and see the current temperature where they farm.</p>
+    <nav aria-label="Page sections">
+      <ul class="nav-list">
+        <li><a href="#add-heading">Add a farmer</a></li>
+        <li><a href="#list-heading">Farmers</a></li>
+        <li><a href="#context-heading">Context</a></li>
+      </ul>
+    </nav>
   </header>
 
-  <main>
+  <main id="main">
     <section aria-labelledby="add-heading">
       <h2 id="add-heading">Add a farmer</h2>
-      <div class="fields">
-        <div>
-          <label for="farmer-name">Name</label>
-          <input id="farmer-name" type="text">
+      <form id="farmer-form">
+        <div class="fields">
+          <div>
+            <label for="farmer-name">Name</label>
+            <input id="farmer-name" type="text" required minlength="2" maxlength="60" autocomplete="name">
+          </div>
+          <div>
+            <label for="farmer-crop">Main crop</label>
+            <input id="farmer-crop" type="text" list="crops" required maxlength="40">
+            <datalist id="crops">
+              <option value="Maize"></option>
+              <option value="Tobacco"></option>
+              <option value="Cotton"></option>
+              <option value="Soya beans"></option>
+              <option value="Wheat"></option>
+              <option value="Groundnuts"></option>
+            </datalist>
+          </div>
+          <div>
+            <label for="farm-size">Farm size (hectares)</label>
+            <input id="farm-size" type="number" required min="0.1" max="5000" step="0.1" inputmode="decimal">
+          </div>
+          <div>
+            <label for="planting-date">Planting date</label>
+            <input id="planting-date" type="date" required>
+          </div>
         </div>
-        <div>
-          <label for="farmer-crop">Main crop</label>
-          <input id="farmer-crop" type="text">
-        </div>
-        <div>
-          <label for="farmer-town">Town</label>
-          <select id="farmer-town">
-            <option>Harare</option>
-            <option>Bulawayo</option>
-            <option>Mutare</option>
-            <option>Masvingo</option>
-            <option>Bindura</option>
-            <option>Gweru</option>
-          </select>
-        </div>
-      </div>
-      <button id="add-btn" type="button">Add farmer</button>
-      <p id="message" role="status"></p>
+
+        <fieldset>
+          <legend>Town</legend>
+          <div class="fields">
+            <div>
+              <label for="town-search">Search for a town</label>
+              <input id="town-search" type="search" minlength="2" maxlength="40" placeholder="e.g. Chinhoyi">
+              <button id="find-town" type="button" class="secondary">Find town</button>
+            </div>
+            <div>
+              <label for="farmer-town">Choose a town</label>
+              <select id="farmer-town" required>
+                <option data-lat="-17.83" data-lon="31.05">Harare</option>
+                <option data-lat="-20.15" data-lon="28.58">Bulawayo</option>
+                <option data-lat="-18.97" data-lon="32.67">Mutare</option>
+                <option data-lat="-20.07" data-lon="30.83">Masvingo</option>
+                <option data-lat="-17.30" data-lon="31.33" selected>Bindura</option>
+                <option data-lat="-19.45" data-lon="29.82">Gweru</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Water source</legend>
+          <div class="choice">
+            <label><input type="radio" name="water" value="Irrigated" required> Irrigated</label>
+            <label><input type="radio" name="water" value="Rain-fed"> Rain-fed</label>
+          </div>
+        </fieldset>
+
+        <label for="farmer-notes">Notes (optional)</label>
+        <textarea id="farmer-notes" rows="3" maxlength="200"></textarea>
+
+        <button id="add-btn" type="submit">Add farmer</button>
+        <p id="message" role="status"></p>
+      </form>
     </section>
 
     <section aria-labelledby="list-heading">
@@ -45,36 +95,32 @@
       <button id="toggle-list" type="button" aria-expanded="true" aria-controls="table-wrap">Hide farmers</button>
       <div class="table-wrap" id="table-wrap">
         <table>
+          <caption class="sr-only">Farmers with crop, town, farm size, water source and current temperature</caption>
           <thead>
             <tr>
               <th scope="col">Name</th>
               <th scope="col">Main crop</th>
               <th scope="col">Town</th>
+              <th scope="col">Size (ha)</th>
+              <th scope="col">Water</th>
               <th scope="col">Temperature now</th>
             </tr>
           </thead>
           <tbody id="farmer-list">
-            <tr><td colspan="4">Loading farmers...</td></tr>
+            <tr><td colspan="6">Loading farmers...</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="note">Weather data from Open-Meteo.</p>
     </section>
 
-    <section aria-labelledby="progress-heading">
-      <h2 id="progress-heading">What I've built so far</h2>
-      <ul class="progress">
-        <li><strong>Week 1:</strong> HTML basics and page structure</li>
-        <li><strong>Weeks 2 and 3:</strong> CSS, accessibility and usability</li>
-        <li><strong>Week 4:</strong> JavaScript interactivity</li>
-        <li><strong>Week 5:</strong> HTML DOM with <code>getElementById</code>, then the Open-Meteo API with <code>fetch</code></li>
-        <li><strong>Week 6:</strong> jQuery show/hide for the farmer list and fade-in for new rows</li>
-      </ul>
+    <section aria-labelledby="context-heading">
+      <h2 id="context-heading">Context</h2>
+      <p id="context-text">Loading national figures...</p>
     </section>
   </main>
 
   <footer>
-    <p>Built for the Web Technologies module.</p>
+    <p>Built for the Web Technologies module. Weather and town search from <a href="https://open-meteo.com/">Open-Meteo</a>. Land data from the <a href="https://data.worldbank.org/">World Bank</a>.</p>
   </footer>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

@@ -123,3 +123,47 @@ th { color: var(--muted); font-weight: 600; }
 .progress li { margin-bottom: .4rem; }
 
 footer { color: var(--muted); font-size: .9rem; padding-bottom: 2.5rem; }
+
+/* ---- Additions: mobile-first layout, form states, attribute selectors ---- */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.skip-link { position: absolute; left: -999px; top: 0; padding: .5rem 1rem; background: var(--accent); color: var(--accent-ink); }
+.skip-link:focus { left: 1rem; top: 1rem; z-index: 10; }
+
+.nav-list { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; list-style: none; margin: 0 0 1.5rem; padding: 0; }
+.nav-list a { color: var(--accent); font-weight: 600; }
+.nav-list li:first-child a { text-decoration: none; }
+
+/* base = phones: one column; wider screens add columns */
+.fields { grid-template-columns: 1fr; }
+@media (min-width: 40rem) { .fields { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 60rem) { header, main, footer { max-width: 56rem; } }
+
+fieldset { border: 1px solid var(--line); border-radius: 6px; margin: 0 0 1rem; padding: .75rem 1rem 1rem; }
+legend { font-weight: 600; padding: 0 .4rem; }
+
+textarea {
+  width: 100%; padding: .5rem .6rem; margin-bottom: 1rem; font: inherit;
+  color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 6px; resize: vertical;
+}
+textarea:focus-visible { outline: 3px solid var(--wheat); outline-offset: 2px; }
+
+.choice { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; }
+.choice label { display: inline-flex; align-items: center; gap: .4rem; font-weight: 400; margin: 0; }
+input[type="radio"] { width: auto; }
+
+input[required], select[required] { border-left: 4px solid var(--accent); }
+input[type="number"] { max-width: 100%; }
+input[type="search"] { margin-bottom: .5rem; }
+input:user-invalid, textarea:user-invalid { border-color: #b3261e; }
+
+button.secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+button:disabled { opacity: .6; cursor: wait; }
+
+tbody tr:nth-child(even) { background: var(--bg); }
+tbody tr:hover { outline: 1px solid var(--line); }
+
+a { color: var(--accent); }
+a[href^="https"]::after { content: " \2197"; font-size: .8em; }
+.nav-list a[href^="#"]::after { content: none; }
